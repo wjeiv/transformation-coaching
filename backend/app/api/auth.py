@@ -257,8 +257,20 @@ async def google_callback(
 
 
 @router.get("/me", response_model=UserResponse)
-async def get_me(current_user: User = Depends(get_current_user)):
+async def get_me(
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db)
+):
     """Get current user profile."""
+    # Check if user has garmin credentials without loading the relationship
+    from sqlalchemy import select
+    from app.models.user import GarminCredentials
+    
+    result = await db.execute(
+        select(GarminCredentials.is_connected).where(GarminCredentials.user_id == current_user.id)
+    )
+    garmin_connected = result.scalar_one_or_none() or False
+    
     return UserResponse(
         id=current_user.id,
         email=current_user.email,
@@ -269,6 +281,5 @@ async def get_me(current_user: User = Depends(get_current_user)):
         coach_id=current_user.coach_id,
         created_at=current_user.created_at,
         last_login=current_user.last_login,
-        garmin_connected=current_user.garmin_credentials is not None
-        and current_user.garmin_credentials.is_connected,
+        garmin_connected=garmin_connected,
     )

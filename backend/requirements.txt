@@ -14,12 +14,12 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 bcrypt==4.1.2
 authlib==1.3.0
-httpx==0.27.0
+httpx==0.26.*
 itsdangerous==2.1.2
 
 # Garmin Connect
 garminconnect==0.2.19
-garth==0.4.14
+garth>=0.4.46
 
 # Encryption
 cryptography==42.0.5
@@ -30,7 +30,7 @@ pydantic-settings==2.1.0
 email-validator==2.1.0
 
 # Testing
-pytest==8.0.1
+pytest==7.*
 pytest-asyncio==0.23.5
 pytest-cov==4.1.0
 pytest-httpx==0.28.0
