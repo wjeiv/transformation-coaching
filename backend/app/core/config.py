@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     RATE_LIMIT_PER_MINUTE: int = 60
 
     class Config:
-        env_file = ".env"
+        env_file = "dev.env"
         case_sensitive = True
 
 
