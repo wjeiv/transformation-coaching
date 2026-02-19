@@ -243,6 +243,39 @@ The production setup includes:
 
 > **Note**: Garmin does not offer a public OAuth API for workout management. This app uses the same authentication method as the official Garmin Connect mobile app via the `python-garminconnect` library.
 
+## Original Prompt (Opus 4.6)
+I need to create a website for a personal coaching business.  The website should be attractive to potential customers, easy to navigate for current customers, and useful for coaches and me (the administrator).  The following are user, feature, and non-functional requirements and expectations:
+
+User Requirements:
+1. The website should support four personas
+    A: The administrator: This is essentially me.  I need to be able to access the website and be able to see a list of current users on the platform and simple stats about them, such as when they've logged in, and other typical user information.  I need a way to create a new account or remove an account, identify that account as a coach or athlete (or admin).
+    B: The coach: This is for the business owner.  Should be able to link and unlink to athlete accounts, and share specific garmin workouts to specific athletes
+    C: The athlete: This is the paying customer who is linked to a coach.  This athlete can create their own account, authenticate via google if they wish, and choose their coach from the list of coaches available.  They should be able to link their garmin connect account (more on that later) and push or update workouts to their garmin connect account that their coach has shared with them.
+    D: The potential customer: The general website (without logging in) needs to have a pleasant presentation showing the overall mission/charter of the business and invite potential customers to reach out for the services that the coach provides.
+
+Feature Requirements:
+1. The website needs to allow athletes to create an account.  Only an administrator can create a coach account.
+2. The website needs to have a feature where the athlete and coach enter their credentials to garmin connect in order to get access to the garmin connect API
+3. If there extra steps for us to access the garmin connect API for a specific user, such as an API KEY, the steps to gather this are clearly described in the website, along with a way to paste that key into our website for storage and use in sharing workouts
+4. The coach must be able to view all of their garmin workouts (which can be strength, bike, swim, or running type workouts)
+5. The coach must be select workouts from the list and select an athlete to share them with
+6. The website must be able to verify connectivity to the athletes garmin connect data when the coach selects the athlete so the coach knows immediately if the sync will succeed or not.  Provide ample human-readable responses for success and failure to help diagnose if something goes wrong.  (like if the athlete hasn't provided an API TOKEN if such a thing is required
+7. The athlete must be able to log in and see the workouts that the coach has shared.
+8. The athlete can select workouts to import into their garmin connect account.
+9. The athlete must be able to remove workouts from the website once they've imported them, if they want to.
+
+Non-Functional Requirements:
+1. In the past, I've used the garmin_connect python library to achieve a lot of this.  Do research to decide the best path to achieve the use cases around exporting workouts from one garmin account -> importing those workouts into another account.  I have an existing git repository that does this with limited success: @https://github.com/wjeiv/python-garminconnect.  I specifically wrote @client_pull_workouts.py and @coach_push_workouts.py.
+2. It would be ideal for the website to have a good mobile user experience.
+3. Use a backend database (SQL is ok) to keep all of this information.
+4. Design with security in mind.  Do not let vulnerabilities exist.
+5. The solution should be containerized so I can develop in this environment and deploy in a completely different environment, like my TrueNAS server
+6. Test suite should include connectivity (actually connectivity) to garmin connect, even if it requires entering credentials.
+7. The website's branding is all around Transformation Coaching.  Branding (the dragonfly), mission statement, can all be found on @https://www.facebook.com/profile.php?id=61582142645650
+8. The repo for this will be @https://github.com/wjeiv/transformation-coaching.  It is currently empty and you will responsible for building it out for this solution.
+9. I expect full test suites, coverage tests, and explicit instructions on build, test, containerization, and deployment so it can be done out of cycle by a human.
+
+
 ## License
 
 Private — All rights reserved.

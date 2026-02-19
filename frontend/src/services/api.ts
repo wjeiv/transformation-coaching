@@ -102,6 +102,13 @@ export const adminAPI = {
 // --- Coach ---
 export const coachAPI = {
   listAthletes: () => api.get("/coach/athletes"),
+  listUsers: (params?: {
+    role?: string;
+    search?: string;
+    only_unlinked?: boolean;
+    skip?: number;
+    limit?: number;
+  }) => api.get("/coach/users", { params }),
   linkAthlete: (athleteId: number) =>
     api.post(`/coach/athletes/${athleteId}/link`),
   unlinkAthlete: (athleteId: number) =>

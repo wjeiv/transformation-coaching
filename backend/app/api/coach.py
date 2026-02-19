@@ -2,7 +2,7 @@ import json
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -14,6 +14,7 @@ from app.api.schemas import (
     ShareWorkoutFromGarminRequest,
     SharedWorkoutListResponse,
     SharedWorkoutResponse,
+    UserListResponse,
     UserResponse,
 )
 from app.core.database import get_db
@@ -54,6 +55,61 @@ async def list_my_athletes(
     ]
 
 
+@router.get("/users", response_model=UserListResponse)
+async def list_all_users(
+    role: Optional[str] = Query(None, pattern="^(coach|athlete)$"),
+    search: Optional[str] = None,
+    only_unlinked: Optional[bool] = Query(False),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    coach: User = Depends(get_current_coach),
+    db: AsyncSession = Depends(get_db),
+):
+    """List all users (athletes and coaches) for linking purposes."""
+    query = select(User).options(selectinload(User.garmin_credentials))
+    count_query = select(func.count(User.id))
+
+    # Apply filters
+    if role:
+        query = query.where(User.role == UserRole(role))
+        count_query = count_query.where(User.role == UserRole(role))
+    if search:
+        search_filter = (
+            User.email.ilike(f"%{search}%") | User.full_name.ilike(f"%{search}%")
+        )
+        query = query.where(search_filter)
+        count_query = count_query.where(search_filter)
+    if only_unlinked:
+        query = query.where(User.coach_id.is_(None))
+        count_query = count_query.where(User.coach_id.is_(None))
+
+    total = (await db.execute(count_query)).scalar() or 0
+    result = await db.execute(
+        query.order_by(User.full_name).offset(skip).limit(limit)
+    )
+    users = result.scalars().all()
+
+    return UserListResponse(
+        users=[
+            UserResponse(
+                id=u.id,
+                email=u.email,
+                full_name=u.full_name,
+                role=u.role.value,
+                is_active=u.is_active,
+                avatar_url=u.avatar_url,
+                coach_id=u.coach_id,
+                created_at=u.created_at,
+                last_login=u.last_login,
+                garmin_connected=u.garmin_credentials is not None
+                and u.garmin_credentials.is_connected,
+            )
+            for u in users
+        ],
+        total=total,
+    )
+
+
 @router.post("/athletes/{athlete_id}/link")
 async def link_athlete(
     athlete_id: int,
@@ -67,6 +123,16 @@ async def link_athlete(
     athlete = result.scalar_one_or_none()
     if not athlete:
         raise HTTPException(status_code=404, detail="Athlete not found")
+    
+    if athlete.coach_id is not None:
+        if athlete.coach_id == coach.id:
+            raise HTTPException(status_code=400, detail="This athlete is already linked to you")
+        else:
+            raise HTTPException(
+                status_code=400, 
+                detail="This athlete is already linked to another coach. Only admins can reassign athletes."
+            )
+    
     athlete.coach_id = coach.id
     await db.flush()
     return {"status": "ok", "message": f"{athlete.full_name} is now linked to you"}

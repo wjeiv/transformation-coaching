@@ -10,6 +10,19 @@ interface Athlete {
   last_login: string | null;
 }
 
+interface User {
+  id: number;
+  full_name: string;
+  email: string;
+  role: string;
+  is_active: boolean;
+  avatar_url: string | null;
+  coach_id: number | null;
+  created_at: string;
+  last_login: string | null;
+  garmin_connected: boolean;
+}
+
 interface GarminWorkout {
   garmin_workout_id: string;
   workout_name: string;
@@ -45,9 +58,37 @@ const CoachDashboard: React.FC = () => {
   const [sharing, setSharing] = useState(false);
   const [checkingConnection, setCheckingConnection] = useState(false);
 
+  // Link athletes state
+  const [allUsers, setAllUsers] = useState<User[]>([]);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [roleFilter, setRoleFilter] = useState("all");
+  const [onlyUnlinked, setOnlyUnlinked] = useState(false);
+  const [loadingUsers, setLoadingUsers] = useState(false);
+  const [linkingUserId, setLinkingUserId] = useState<number | null>(null);
+
   useEffect(() => {
     coachAPI.listAthletes().then((r) => setAthletes(r.data)).catch(() => {});
   }, []);
+
+  const loadUsers = async () => {
+    setLoadingUsers(true);
+    try {
+      const params: any = {};
+      if (searchTerm) params.search = searchTerm;
+      if (roleFilter !== "all") params.role = roleFilter;
+      if (onlyUnlinked) params.only_unlinked = true;
+      const resp = await coachAPI.listUsers(params);
+      setAllUsers(resp.data.users);
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to load users");
+    } finally {
+      setLoadingUsers(false);
+    }
+  };
+
+  useEffect(() => {
+    loadUsers();
+  }, [searchTerm, roleFilter, onlyUnlinked]);
 
   const loadWorkouts = async () => {
     setLoadingWorkouts(true);
@@ -105,6 +146,21 @@ const CoachDashboard: React.FC = () => {
       toast.error(err.response?.data?.detail || "Failed to share workouts");
     } finally {
       setSharing(false);
+    }
+  };
+
+  const handleLinkUser = async (userId: number) => {
+    setLinkingUserId(userId);
+    try {
+      await coachAPI.linkAthlete(userId);
+      toast.success("Athlete linked successfully!");
+      // Refresh both lists
+      loadUsers();
+      coachAPI.listAthletes().then((r) => setAthletes(r.data)).catch(() => {});
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to link athlete");
+    } finally {
+      setLinkingUserId(null);
     }
   };
 
@@ -167,82 +223,165 @@ const CoachDashboard: React.FC = () => {
           )}
         </div>
 
-        {/* Workouts Panel */}
+        {/* Link Athletes Panel */}
         <div className="card lg:col-span-2">
-          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
-            <h2 className="text-lg font-semibold">Garmin Workouts</h2>
-            <div className="flex gap-2">
-              <select
-                className="input-field text-sm py-2 w-36"
-                value={typeFilter}
-                onChange={(e) => setTypeFilter(e.target.value)}
-              >
-                <option value="">All Types</option>
-                <option value="running">Running</option>
-                <option value="cycling">Cycling</option>
-                <option value="swimming">Swimming</option>
-                <option value="strength">Strength</option>
-              </select>
-              <button onClick={loadWorkouts} disabled={loadingWorkouts} className="btn-secondary text-sm py-2">
-                {loadingWorkouts ? "Loading..." : "Refresh"}
-              </button>
-            </div>
+          <h2 className="text-lg font-semibold mb-4">Link Athletes</h2>
+          
+          {/* Search and Filters */}
+          <div className="flex flex-col sm:flex-row gap-3 mb-4">
+            <input
+              type="text"
+              placeholder="Search by name or email..."
+              className="input-field text-sm"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <select
+              className="input-field text-sm"
+              value={roleFilter}
+              onChange={(e) => setRoleFilter(e.target.value)}
+            >
+              <option value="all">All Roles</option>
+              <option value="athlete">Athletes Only</option>
+              <option value="coach">Coaches Only</option>
+            </select>
+            <label className="flex items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={onlyUnlinked}
+                onChange={(e) => setOnlyUnlinked(e.target.checked)}
+                className="rounded border-gray-300 text-dragonfly focus:ring-dragonfly"
+              />
+              Only unlinked athletes
+            </label>
           </div>
 
-          {workouts.length === 0 ? (
-            <div className="text-center py-12 text-gray-500">
-              <p className="text-sm">No workouts found. Connect your Garmin account in Settings to see your workouts here.</p>
+          {/* Users List */}
+          {loadingUsers ? (
+            <div className="text-center py-8 text-gray-500 animate-pulse">Loading users...</div>
+          ) : allUsers.length === 0 ? (
+            <div className="text-center py-8 text-gray-500">
+              <p className="text-sm">No users found matching your criteria.</p>
             </div>
           ) : (
-            <div className="space-y-2 max-h-[500px] overflow-y-auto">
-              {workouts.map((w) => (
-                <label
-                  key={w.garmin_workout_id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
-                    selectedWorkouts.has(w.garmin_workout_id)
-                      ? "border-dragonfly bg-dragonfly/5"
-                      : "border-gray-200 hover:border-gray-300"
-                  }`}
+            <div className="space-y-2 max-h-[400px] overflow-y-auto">
+              {allUsers.map((user) => (
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all"
                 >
-                  <input
-                    type="checkbox"
-                    checked={selectedWorkouts.has(w.garmin_workout_id)}
-                    onChange={() => toggleWorkout(w.garmin_workout_id)}
-                    className="rounded border-gray-300 text-dragonfly focus:ring-dragonfly"
-                  />
                   <div className="flex-1 min-w-0">
-                    <div className="font-medium text-sm truncate">{w.workout_name}</div>
-                    {w.description && (
-                      <div className="text-xs text-gray-500 truncate">{w.description}</div>
-                    )}
+                    <div className="flex items-center gap-2">
+                      <div className="font-medium text-sm truncate">{user.full_name}</div>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                        user.role === "athlete" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                      }`}>
+                        {user.role}
+                      </span>
+                      {user.coach_id && (
+                        <span className="text-xs text-gray-500">Already linked</span>
+                      )}
+                    </div>
+                    <div className="text-xs text-gray-500 truncate">{user.email}</div>
                   </div>
-                  <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                    workoutTypeColors[w.workout_type] || workoutTypeColors.other
-                  }`}>
-                    {w.workout_type}
-                  </span>
-                </label>
+                  {user.role === "athlete" && !user.coach_id ? (
+                    <button
+                      onClick={() => handleLinkUser(user.id)}
+                      disabled={linkingUserId === user.id}
+                      className="btn-primary text-sm py-1 px-3"
+                    >
+                      {linkingUserId === user.id ? "Linking..." : "Link"}
+                    </button>
+                  ) : (
+                    <button
+                      disabled
+                      className="btn-secondary text-sm py-1 px-3 opacity-50 cursor-not-allowed"
+                    >
+                      {user.role !== "athlete" ? "Not an athlete" : "Already linked"}
+                    </button>
+                  )}
+                </div>
               ))}
             </div>
           )}
+        </div>
+      </div>
 
-          {/* Share Button */}
-          <div className="mt-4 pt-4 border-t border-gray-200">
-            <button
-              onClick={handleShare}
-              disabled={sharing || selectedWorkouts.size === 0 || !selectedAthlete || (connectionCheck !== null && !connectionCheck.is_connected)}
-              className="btn-primary w-full sm:w-auto"
+      {/* Workouts Panel */}
+      <div className="card mt-6">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4">
+          <h2 className="text-lg font-semibold">Garmin Workouts</h2>
+          <div className="flex gap-2">
+            <select
+              className="input-field text-sm py-2 w-36"
+              value={typeFilter}
+              onChange={(e) => setTypeFilter(e.target.value)}
             >
-              {sharing
-                ? "Sharing..."
-                : `Share ${selectedWorkouts.size} workout${selectedWorkouts.size !== 1 ? "s" : ""} with athlete`}
+              <option value="">All Types</option>
+              <option value="running">Running</option>
+              <option value="cycling">Cycling</option>
+              <option value="swimming">Swimming</option>
+              <option value="strength">Strength</option>
+            </select>
+            <button onClick={loadWorkouts} disabled={loadingWorkouts} className="btn-secondary text-sm py-2">
+              {loadingWorkouts ? "Loading..." : "Refresh"}
             </button>
-            {selectedAthlete && connectionCheck && !connectionCheck.is_connected && (
-              <p className="text-sm text-red-600 mt-2">
-                Cannot share — athlete's Garmin connection has issues. See recommendations above.
-              </p>
-            )}
           </div>
+        </div>
+
+        {workouts.length === 0 ? (
+          <div className="text-center py-12 text-gray-500">
+            <p className="text-sm">No workouts found. Connect your Garmin account in Settings to see your workouts here.</p>
+          </div>
+        ) : (
+          <div className="space-y-2 max-h-[500px] overflow-y-auto">
+            {workouts.map((w) => (
+              <label
+                key={w.garmin_workout_id}
+                className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+                  selectedWorkouts.has(w.garmin_workout_id)
+                    ? "border-dragonfly bg-dragonfly/5"
+                    : "border-gray-200 hover:border-gray-300"
+                }`}
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedWorkouts.has(w.garmin_workout_id)}
+                  onChange={() => toggleWorkout(w.garmin_workout_id)}
+                  className="rounded border-gray-300 text-dragonfly focus:ring-dragonfly"
+                />
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate">{w.workout_name}</div>
+                  {w.description && (
+                    <div className="text-xs text-gray-500 truncate">{w.description}</div>
+                  )}
+                </div>
+                <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                  workoutTypeColors[w.workout_type] || workoutTypeColors.other
+                }`}>
+                  {w.workout_type}
+                </span>
+              </label>
+            ))}
+          </div>
+        )}
+
+        {/* Share Button */}
+        <div className="mt-4 pt-4 border-t border-gray-200">
+          <button
+            onClick={handleShare}
+            disabled={sharing || selectedWorkouts.size === 0 || !selectedAthlete || (connectionCheck !== null && !connectionCheck.is_connected)}
+            className="btn-primary w-full sm:w-auto"
+          >
+            {sharing
+              ? "Sharing..."
+              : `Share ${selectedWorkouts.size} workout${selectedWorkouts.size !== 1 ? "s" : ""} with athlete`}
+          </button>
+          {selectedAthlete && connectionCheck && !connectionCheck.is_connected && (
+            <p className="text-sm text-red-600 mt-2">
+              Cannot share — athlete's Garmin connection has issues. See recommendations above.
+            </p>
+          )}
         </div>
       </div>
     </div>
