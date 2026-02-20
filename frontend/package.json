@@ -1,6 +1,6 @@
 {
   "name": "transformation-coaching-frontend",
-  "version": "1.1.0",
+  "version": "1.1.6",
   "private": true,
   "dependencies": {
     "@headlessui/react": "^1.7.18",

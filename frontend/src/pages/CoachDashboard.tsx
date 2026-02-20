@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { coachAPI } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
 interface Athlete {
@@ -49,6 +50,7 @@ const workoutTypeColors: Record<string, string> = {
 };
 
 const CoachDashboard: React.FC = () => {
+  const { user: currentUser } = useAuth();
   const [athletes, setAthletes] = useState<Athlete[]>([]);
   const [workouts, setWorkouts] = useState<GarminWorkout[]>([]);
   const [selectedWorkouts, setSelectedWorkouts] = useState<Set<string>>(new Set());
@@ -160,6 +162,26 @@ const CoachDashboard: React.FC = () => {
       coachAPI.listAthletes().then((r) => setAthletes(r.data)).catch(() => {});
     } catch (err: any) {
       toast.error(err.response?.data?.detail || "Failed to link athlete");
+    } finally {
+      setLinkingUserId(null);
+    }
+  };
+
+  const handleUnlinkAthlete = async (athleteId: number) => {
+    setLinkingUserId(athleteId);
+    try {
+      await coachAPI.unlinkAthlete(athleteId);
+      toast.success("Athlete unlinked successfully!");
+      // Refresh both lists
+      loadUsers();
+      coachAPI.listAthletes().then((r) => setAthletes(r.data)).catch(() => {});
+      // Clear selection if this athlete was selected
+      if (selectedAthlete === athleteId) {
+        setSelectedAthlete(null);
+        setConnectionCheck(null);
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to unlink athlete");
     } finally {
       setLinkingUserId(null);
     }
@@ -299,7 +321,9 @@ const CoachDashboard: React.FC = () => {
                           {user.role}
                         </span>
                         {user.coach_id && (
-                          <span className="text-xs text-gray-500">Already linked</span>
+                          <span className="text-xs text-gray-500">
+                            {user.coach_id === currentUser?.id ? "Linked to you" : "Linked to another coach"}
+                          </span>
                         )}
                       </div>
                       <div className="text-xs text-gray-500 truncate">{user.email}</div>
@@ -313,12 +337,20 @@ const CoachDashboard: React.FC = () => {
                     >
                       {linkingUserId === user.id ? "Linking..." : "Link"}
                     </button>
+                  ) : user.role === "athlete" && user.coach_id === currentUser?.id ? (
+                    <button
+                      onClick={() => handleUnlinkAthlete(user.id)}
+                      disabled={linkingUserId === user.id}
+                      className="btn-secondary text-sm py-1 px-3 text-red-600 hover:bg-red-50 border-red-200 hover:border-red-300"
+                    >
+                      {linkingUserId === user.id ? "Unlinking..." : "Unlink athlete"}
+                    </button>
                   ) : (
                     <button
                       disabled
                       className="btn-secondary text-sm py-1 px-3 opacity-50 cursor-not-allowed"
                     >
-                      {user.role !== "athlete" ? "Not an athlete" : "Already linked"}
+                      {user.role !== "athlete" ? "Not an athlete" : "Linked to another coach"}
                     </button>
                   )}
                 </div>
