@@ -127,7 +127,7 @@ class GarminService:
             import_data.pop("createdDate", None)
             import_data.pop("updatedDate", None)
 
-            result = client.save_workout(import_data)
+            result = client.upload_workout(import_data)
 
             new_id = None
             if isinstance(result, dict):

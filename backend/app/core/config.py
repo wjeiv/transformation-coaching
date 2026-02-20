@@ -13,8 +13,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 30
 
     # Database
-    DATABASE_URL: str = "postgresql+asyncpg://tc_user:tc_password@db:5432/transformation_coaching"
-    DATABASE_URL_SYNC: str = "postgresql://tc_user:tc_password@db:5432/transformation_coaching"
+    DATABASE_URL: str = "sqlite+aiosqlite:///./app.db"
+    DATABASE_URL_SYNC: str = "sqlite:///./app.db"
 
     # CORS - Handle both string and list formats
     BACKEND_CORS_ORIGINS: List[str] = [
