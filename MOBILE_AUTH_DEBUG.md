@@ -3,6 +3,25 @@
 ## Issue Summary
 Mobile web Chrome login is not working through transformationcoaching262.com. This guide helps diagnose and fix mobile-specific authentication issues.
 
+## February 2026 Incident - Desktop Works / Mobile Fails
+
+### Root Cause
+The frontend was defaulting API requests to `http://localhost:8000/api/v1` when `REACT_APP_API_URL` was not set.
+
+On desktop this could appear to work depending on local environment or prior builds, but on a phone `localhost` resolves to the phone itself (not the server), so `/auth/login` requests fail.
+
+### Fix
+Update the frontend default API base URL to use same-origin routing through nginx:
+
+- **File**: `frontend/src/services/api.ts`
+- **Change**: `API_URL` default changed from `http://localhost:8000/api/v1` to `/api/v1`
+
+This ensures both desktop and mobile always call `https://transformationcoaching262.com/api/v1/...` (via nginx proxy) in production.
+
+### Related Config
+- **nginx** proxies `/api/` to the backend container.
+- **Backend** CORS already includes `https://transformationcoaching262.com` and `https://www.transformationcoaching262.com`.
+
 ## Mobile Chrome Specific Issues
 
 ### 1. User Agent Handling
