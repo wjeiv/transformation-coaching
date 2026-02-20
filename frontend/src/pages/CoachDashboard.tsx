@@ -8,6 +8,7 @@ interface Athlete {
   email: string;
   garmin_connected: boolean;
   last_login: string | null;
+  avatar_url: string | null;
 }
 
 interface User {
@@ -186,8 +187,19 @@ const CoachDashboard: React.FC = () => {
                       : "border-gray-200 hover:border-gray-300"
                   }`}
                 >
-                  <div className="font-medium text-sm">{a.full_name}</div>
-                  <div className="text-xs text-gray-500">{a.email}</div>
+                  <div className="flex items-center gap-2">
+                    {a.avatar_url && (
+                      <img 
+                        src={a.avatar_url} 
+                        alt={a.full_name}
+                        className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                      />
+                    )}
+                    <div className="flex-1">
+                      <div className="font-medium text-sm">{a.full_name}</div>
+                      <div className="text-xs text-gray-500">{a.email}</div>
+                    </div>
+                  </div>
                   <div className="flex gap-2 mt-1">
                     <span className={`text-xs ${a.garmin_connected ? "text-green-600" : "text-gray-400"}`}>
                       {a.garmin_connected ? "Garmin ✓" : "No Garmin"}
@@ -270,19 +282,28 @@ const CoachDashboard: React.FC = () => {
                   key={user.id}
                   className="flex items-center justify-between p-3 rounded-lg border border-gray-200 hover:border-gray-300 transition-all"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <div className="font-medium text-sm truncate">{user.full_name}</div>
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
-                        user.role === "athlete" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
-                      }`}>
-                        {user.role}
-                      </span>
-                      {user.coach_id && (
-                        <span className="text-xs text-gray-500">Already linked</span>
-                      )}
+                  <div className="flex items-center gap-2">
+                    {user.avatar_url && (
+                      <img 
+                        src={user.avatar_url} 
+                        alt={user.full_name}
+                        className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                      />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <div className="font-medium text-sm truncate">{user.full_name}</div>
+                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${
+                          user.role === "athlete" ? "bg-blue-100 text-blue-700" : "bg-purple-100 text-purple-700"
+                        }`}>
+                          {user.role}
+                        </span>
+                        {user.coach_id && (
+                          <span className="text-xs text-gray-500">Already linked</span>
+                        )}
+                      </div>
+                      <div className="text-xs text-gray-500 truncate">{user.email}</div>
                     </div>
-                    <div className="text-xs text-gray-500 truncate">{user.email}</div>
                   </div>
                   {user.role === "athlete" && !user.coach_id ? (
                     <button

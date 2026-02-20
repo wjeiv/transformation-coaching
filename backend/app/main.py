@@ -38,6 +38,7 @@ async def create_first_admin():
                 hashed_password=get_password_hash(settings.FIRST_ADMIN_PASSWORD),
                 full_name="Administrator",
                 role=UserRole.ADMIN,
+                avatar_url="https://images.freeimages.com/fic/images/icons/2526/bloggers/256/admin.png",
             )
             session.add(admin_user)
             await session.commit()
@@ -47,7 +48,7 @@ async def create_first_admin():
 async def seed_default_users():
     """Seed default coach and athlete if they don't exist."""
     async with async_session() as session:
-        # Create coach: Bill Coach
+        # Create coach: Bill Elliott
         coach_result = await session.execute(
             select(User).where(User.email == "wjeiv4@gmail.com")
         )
@@ -56,12 +57,30 @@ async def seed_default_users():
             coach = User(
                 email="wjeiv4@gmail.com",
                 hashed_password=get_password_hash("FFester1!"),
-                full_name="Bill Coach",
+                full_name="Bill Elliott",
                 role=UserRole.COACH,
+                avatar_url="https://media.licdn.com/dms/image/v2/D4E03AQH5Qk0ugDez7w/profile-displayphoto-shrink_200_200/profile-displayphoto-shrink_200_200/0/1680190442722?e=2147483647&v=beta&t=YovX3kVWibi7tsCyrc-TGMfkTex4jn83BV7xcWDsMHw",
             )
             session.add(coach)
             await session.flush()
-            logger.info("Created default coach: Bill Coach (wjeiv4@gmail.com)")
+            logger.info("Created default coach: Bill Elliott (wjeiv4@gmail.com)")
+
+        # Create coach: Heather Gladwin
+        heather_result = await session.execute(
+            select(User).where(User.email == "transformation.coaching26.2@gmail.com")
+        )
+        heather = heather_result.scalar_one_or_none()
+        if not heather:
+            heather = User(
+                email="transformation.coaching26.2@gmail.com",
+                hashed_password=get_password_hash("12141973"),
+                full_name="Heather Gladwin",
+                role=UserRole.COACH,
+                avatar_url="https://www.telegram.com/gcdn/authoring/2020/04/11/NTEG/ghows-WT-a30a96bb-0efe-0b13-e053-0100007ff843-b279a6db.jpeg",
+            )
+            session.add(heather)
+            await session.flush()
+            logger.info("Created default coach: Heather Gladwin (transformation.coaching26.2@gmail.com)")
 
         # Create athlete: Gretchen Hickey linked to Bill Coach
         athlete_result = await session.execute(
@@ -75,6 +94,7 @@ async def seed_default_users():
                 full_name="Gretchen Hickey",
                 role=UserRole.ATHLETE,
                 coach_id=coach.id,
+                avatar_url="https://oswegolakers.com/images/2024/2/24/IMG_6646.JPEG",
             )
             session.add(athlete)
             logger.info("Created default athlete: Gretchen Hickey linked to Bill Coach")

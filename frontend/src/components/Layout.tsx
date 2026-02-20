@@ -23,16 +23,19 @@ const Layout: React.FC = () => {
     switch (user.role) {
       case "admin":
         return [
+          { to: "/", label: "Home" },
           { to: "/admin", label: "Dashboard" },
           { to: "/settings", label: "Settings" },
         ];
       case "coach":
         return [
+          { to: "/", label: "Home" },
           { to: "/coach", label: "Dashboard" },
           { to: "/settings", label: "Settings" },
         ];
       case "athlete":
         return [
+          { to: "/", label: "Home" },
           { to: "/athlete", label: "Dashboard" },
           { to: "/athlete/workouts", label: "My Workouts" },
           { to: "/settings", label: "Settings" },
@@ -78,12 +81,21 @@ const Layout: React.FC = () => {
             <div className="flex items-center gap-3">
               {user ? (
                 <>
-                  <span className="hidden sm:block text-sm text-gray-600">
-                    {user.full_name}
-                    <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-dragonfly/10 text-dragonfly font-medium">
-                      {user.role}
+                  <div className="hidden sm:flex items-center gap-2">
+                    {user.avatar_url && (
+                      <img 
+                        src={user.avatar_url} 
+                        alt={user.full_name}
+                        className="w-8 h-8 rounded-full object-cover border border-gray-200"
+                      />
+                    )}
+                    <span className="text-sm text-gray-600">
+                      {user.full_name}
+                      <span className="ml-1 text-xs px-2 py-0.5 rounded-full bg-dragonfly/10 text-dragonfly font-medium">
+                        {user.role}
+                      </span>
                     </span>
-                  </span>
+                  </div>
                   <button onClick={handleLogout} className="btn-secondary text-xs py-2 px-3">
                     Logout
                   </button>
@@ -122,8 +134,15 @@ const Layout: React.FC = () => {
         {mobileMenuOpen && user && (
           <div className="md:hidden border-t border-gray-200 bg-white">
             <div className="px-4 py-3 space-y-1">
-              <div className="text-sm text-gray-600 pb-2 border-b border-gray-100 mb-2">
-                {user.full_name} ({user.role})
+              <div className="flex items-center gap-2 text-sm text-gray-600 pb-2 border-b border-gray-100 mb-2">
+                {user.avatar_url && (
+                  <img 
+                    src={user.avatar_url} 
+                    alt={user.full_name}
+                    className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                  />
+                )}
+                <span>{user.full_name} ({user.role})</span>
               </div>
               {navLinks().map((link) => (
                 <Link

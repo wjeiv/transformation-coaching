@@ -65,7 +65,7 @@ async def db_session() -> AsyncGenerator[AsyncSession, None]:
 @pytest_asyncio.fixture
 async def admin_user(db_session: AsyncSession) -> User:
     user = User(
-        email="admin@test.com",
+        email="admin@transformationcoaching.com",
         hashed_password=get_password_hash("adminpass123"),
         full_name="Test Admin",
         role=UserRole.ADMIN,
@@ -108,7 +108,7 @@ async def athlete_user(db_session: AsyncSession) -> User:
 async def admin_token(client: AsyncClient, admin_user: User) -> str:
     resp = await client.post(
         "/api/v1/auth/login",
-        json={"email": "admin@test.com", "password": "adminpass123"},
+        json={"email": "admin@transformationcoaching.com", "password": "adminpass123"},
     )
     return resp.json()["access_token"]
 

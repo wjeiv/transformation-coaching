@@ -21,6 +21,10 @@ class Settings(BaseSettings):
         "http://localhost:3000",
         "http://localhost:8000",
         "http://127.0.0.1:3000",
+        "https://transformationcoaching262.com",
+        "https://www.transformationcoaching262.com",
+        "https://transformationcoaching.wjeiv.com",
+        "https://www.transformationcoaching.wjeiv.com",
     ]
 
     def __init__(self, **kwargs):
@@ -35,6 +39,10 @@ class Settings(BaseSettings):
                     "http://localhost:3000",
                     "http://localhost:8000",
                     "http://127.0.0.1:3000",
+                    "https://transformationcoaching262.com",
+                    "https://www.transformationcoaching262.com",
+                    "https://transformationcoaching.wjeiv.com",
+                    "https://www.transformationcoaching.wjeiv.com",
                 ]
 
     # Google OAuth
@@ -46,7 +54,7 @@ class Settings(BaseSettings):
     GARMIN_ENCRYPTION_KEY: str = secrets.token_urlsafe(32)
 
     # First admin account
-    FIRST_ADMIN_EMAIL: str = "admin"
+    FIRST_ADMIN_EMAIL: str = "admin@transformationcoaching.com"
     FIRST_ADMIN_PASSWORD: str = "FFester1!"
 
     # Rate limiting

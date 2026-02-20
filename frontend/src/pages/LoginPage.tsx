@@ -8,16 +8,33 @@ const LoginPage: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const { login } = useAuth();
+  const { login, user } = useAuth();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await login(email, password);
+      const loggedInUser = await login(email, password);
       toast.success("Welcome back!");
-      navigate("/");
+      // Redirect to appropriate dashboard based on user role
+      if (loggedInUser) {
+        switch (loggedInUser.role) {
+          case "admin":
+            navigate("/admin");
+            break;
+          case "coach":
+            navigate("/coach");
+            break;
+          case "athlete":
+            navigate("/athlete");
+            break;
+          default:
+            navigate("/");
+        }
+      } else {
+        navigate("/");
+      }
     } catch (err: any) {
       toast.error(err.response?.data?.detail || "Login failed");
     } finally {

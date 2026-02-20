@@ -20,6 +20,7 @@ interface UserItem {
   created_at: string;
   last_login: string | null;
   garmin_connected: boolean;
+  avatar_url: string | null;
 }
 
 const AdminDashboard: React.FC = () => {
@@ -187,7 +188,18 @@ const AdminDashboard: React.FC = () => {
             <tbody>
               {users.map((u) => (
                 <tr key={u.id} className="border-b border-gray-100 hover:bg-gray-50">
-                  <td className="py-3 px-2 font-medium">{u.full_name}</td>
+                  <td className="py-3 px-2">
+                    <div className="flex items-center gap-2">
+                      {u.avatar_url && (
+                        <img 
+                          src={u.avatar_url} 
+                          alt={u.full_name}
+                          className="w-6 h-6 rounded-full object-cover border border-gray-200"
+                        />
+                      )}
+                      <span className="font-medium">{u.full_name}</span>
+                    </div>
+                  </td>
                   <td className="py-3 px-2 text-gray-600">{u.email}</td>
                   <td className="py-3 px-2">
                     <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${

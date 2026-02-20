@@ -1,0 +1,119 @@
+{
+  "timestamp": "2026-02-20T16:56:57.849236",
+  "domain": "http://localhost:8080",
+  "mobile_user_agents_tested": [
+    "android_chrome",
+    "iphone_chrome",
+    "ipad_chrome"
+  ],
+  "cors_tests": {
+    "android_chrome": {
+      "success": false,
+      "headers": {
+        "access_control_allow_origin": null,
+        "access_control_allow_methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+        "access_control_allow_headers": "Content-Type, Authorization",
+        "access_control_allow_credentials": "true",
+        "status_code": 400
+      },
+      "user_agent": "android_chrome"
+    },
+    "iphone_chrome": {
+      "success": false,
+      "headers": {
+        "access_control_allow_origin": null,
+        "access_control_allow_methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+        "access_control_allow_headers": "Content-Type, Authorization",
+        "access_control_allow_credentials": "true",
+        "status_code": 400
+      },
+      "user_agent": "iphone_chrome"
+    },
+    "ipad_chrome": {
+      "success": false,
+      "headers": {
+        "access_control_allow_origin": null,
+        "access_control_allow_methods": "DELETE, GET, HEAD, OPTIONS, PATCH, POST, PUT",
+        "access_control_allow_headers": "Content-Type, Authorization",
+        "access_control_allow_credentials": "true",
+        "status_code": 400
+      },
+      "user_agent": "ipad_chrome"
+    }
+  },
+  "login_tests": {
+    "android_chrome": {
+      "success": true,
+      "status_code": 200,
+      "user_agent": "android_chrome",
+      "response_headers": {
+        "server": "nginx/1.29.5",
+        "date": "Fri, 20 Feb 2026 21:56:58 GMT",
+        "content-type": "application/json",
+        "content-length": "341",
+        "connection": "keep-alive",
+        "access-control-allow-credentials": "true"
+      },
+      "has_token": true,
+      "token_length": 140
+    },
+    "iphone_chrome": {
+      "success": true,
+      "status_code": 200,
+      "user_agent": "iphone_chrome",
+      "response_headers": {
+        "server": "nginx/1.29.5",
+        "date": "Fri, 20 Feb 2026 21:56:58 GMT",
+        "content-type": "application/json",
+        "content-length": "341",
+        "connection": "keep-alive",
+        "access-control-allow-credentials": "true"
+      },
+      "has_token": true,
+      "token_length": 140
+    },
+    "ipad_chrome": {
+      "success": true,
+      "status_code": 200,
+      "user_agent": "ipad_chrome",
+      "response_headers": {
+        "server": "nginx/1.29.5",
+        "date": "Fri, 20 Feb 2026 21:56:59 GMT",
+        "content-type": "application/json",
+        "content-length": "341",
+        "connection": "keep-alive",
+        "access-control-allow-credentials": "true"
+      },
+      "has_token": true,
+      "token_length": 140
+    }
+  },
+  "mobile_issues": {
+    "viewport_handling": false,
+    "touch_events": false,
+    "mobile_network": true,
+    "certificate_issues": false,
+    "localstorage_support": false
+  },
+  "database_status": {
+    "admin_exists": true,
+    "admin_active": true,
+    "last_login": null,
+    "recent_activity": []
+  },
+  "errors": [],
+  "recommendations": [
+    {
+      "category": "CORS",
+      "priority": "HIGH",
+      "issue": "CORS failing for mobile user agents: ['android_chrome', 'iphone_chrome', 'ipad_chrome']",
+      "solution": "Check nginx CORS configuration and ensure mobile user agents are properly handled"
+    },
+    {
+      "category": "SSL/TLS",
+      "priority": "CRITICAL",
+      "issue": "SSL certificate validation failing",
+      "solution": "Ensure valid SSL certificate is installed and mobile devices trust the certificate authority"
+    }
+  ]
+}

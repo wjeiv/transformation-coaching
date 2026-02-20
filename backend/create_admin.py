@@ -40,7 +40,7 @@ async def create_admin_account():
         # Create new admin account
         password = "FFester1!"  # Simple password
         admin_user = User(
-            email="admin",
+            email="admin@transformationcoaching.com",
             hashed_password=simple_password_hash(password),
             full_name="Administrator",
             role=UserRole.ADMIN,

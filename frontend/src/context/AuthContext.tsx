@@ -18,7 +18,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (email: string, password: string) => Promise<User | null>;
   register: (email: string, password: string, fullName: string) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
@@ -54,7 +54,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const resp = await authAPI.login(email, password);
     localStorage.setItem("access_token", resp.data.access_token);
     localStorage.setItem("refresh_token", resp.data.refresh_token);
-    await refreshUser();
+    
+    // Get user data directly and set it
+    const userResp = await authAPI.getMe();
+    setUser(userResp.data);
+    
+    return userResp.data;
   };
 
   const register = async (email: string, password: string, fullName: string) => {
