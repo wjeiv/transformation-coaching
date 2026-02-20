@@ -18,7 +18,7 @@ httpx==0.26.*
 itsdangerous==2.1.2
 
 # Garmin Connect
-garminconnect==0.2.19
+garminconnect==0.2.38
 garth>=0.4.46
 
 # Encryption
