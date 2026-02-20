@@ -1,3 +1,4 @@
+import json
 import secrets
 from typing import List
 
@@ -15,12 +16,26 @@ class Settings(BaseSettings):
     DATABASE_URL: str = "postgresql+asyncpg://tc_user:tc_password@db:5432/transformation_coaching"
     DATABASE_URL_SYNC: str = "postgresql://tc_user:tc_password@db:5432/transformation_coaching"
 
-    # CORS
+    # CORS - Handle both string and list formats
     BACKEND_CORS_ORIGINS: List[str] = [
         "http://localhost:3000",
         "http://localhost:8000",
         "http://127.0.0.1:3000",
     ]
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # Handle CORS origins that might be passed as JSON string
+        if isinstance(self.BACKEND_CORS_ORIGINS, str):
+            try:
+                self.BACKEND_CORS_ORIGINS = json.loads(self.BACKEND_CORS_ORIGINS)
+            except (json.JSONDecodeError, TypeError):
+                # Fallback to default if parsing fails
+                self.BACKEND_CORS_ORIGINS = [
+                    "http://localhost:3000",
+                    "http://localhost:8000",
+                    "http://127.0.0.1:3000",
+                ]
 
     # Google OAuth
     GOOGLE_CLIENT_ID: str = ""
