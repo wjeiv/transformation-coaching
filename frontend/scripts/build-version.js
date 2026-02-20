@@ -9,21 +9,23 @@ const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf8'));
 const currentVersion = packageJson.version;
 const [major, minor, patch] = currentVersion.split('.').map(Number);
 
-// Increment minor version
-const newMinorVersion = minor + 1;
-const newVersion = `${major}.${newMinorVersion}.${patch}`;
+// Increment patch version
+const newPatchVersion = patch + 1;
+const newVersion = `${major}.${minor}.${newPatchVersion}`;
 
 // Update package.json
 packageJson.version = newVersion;
 fs.writeFileSync(packageJsonPath, JSON.stringify(packageJson, null, 2));
 
-// Generate build date
-const buildDate = new Date().toLocaleDateString('en-US', {
+// Generate build date using local time
+const now = new Date();
+const buildDate = now.toLocaleDateString('en-US', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
   hour: '2-digit',
-  minute: '2-digit'
+  minute: '2-digit',
+  timeZone: 'America/New_York'
 });
 
 // Create version.ts file with build-time values
