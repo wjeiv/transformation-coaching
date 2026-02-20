@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { garminAPI } from "../services/api";
+import { authAPI, garminAPI } from "../services/api";
 import { useAuth } from "../context/AuthContext";
 import toast from "react-hot-toast";
 
@@ -17,6 +17,40 @@ const SettingsPage: React.FC = () => {
   const [garminPassword, setGarminPassword] = useState("");
   const [connecting, setConnecting] = useState(false);
   const [testing, setTesting] = useState(false);
+
+  // Profile editing state
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profileName, setProfileName] = useState("");
+  const [profileAvatar, setProfileAvatar] = useState("");
+  const [profileVenmo, setProfileVenmo] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+
+  useEffect(() => {
+    if (user) {
+      setProfileName(user.full_name || "");
+      setProfileAvatar(user.avatar_url || "");
+      setProfileVenmo(user.venmo_link || "");
+    }
+  }, [user]);
+
+  const handleSaveProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSavingProfile(true);
+    try {
+      await authAPI.updateMe({
+        full_name: profileName,
+        avatar_url: profileAvatar || undefined,
+        venmo_link: profileVenmo || undefined,
+      });
+      toast.success("Profile updated");
+      setEditingProfile(false);
+      refreshUser();
+    } catch (err: any) {
+      toast.error(err.response?.data?.detail || "Failed to update profile");
+    } finally {
+      setSavingProfile(false);
+    }
+  };
 
   const loadGarminStatus = async () => {
     try {
@@ -88,21 +122,95 @@ const SettingsPage: React.FC = () => {
 
       {/* Profile Info */}
       <div className="card mb-6">
-        <h2 className="text-lg font-semibold mb-4">Profile</h2>
-        <div className="space-y-3 text-sm">
-          <div className="flex justify-between">
-            <span className="text-gray-600">Name</span>
-            <span className="font-medium">{user?.full_name}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Email</span>
-            <span className="font-medium">{user?.email}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">Role</span>
-            <span className="font-medium capitalize">{user?.role}</span>
-          </div>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Profile</h2>
+          {!editingProfile && (
+            <button onClick={() => setEditingProfile(true)} className="btn-secondary text-sm py-1 px-3">
+              Edit
+            </button>
+          )}
         </div>
+
+        {editingProfile ? (
+          <form onSubmit={handleSaveProfile} className="space-y-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+              <input
+                type="text"
+                required
+                className="input-field"
+                value={profileName}
+                onChange={(e) => setProfileName(e.target.value)}
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Profile Picture URL</label>
+              <input
+                type="url"
+                className="input-field"
+                value={profileAvatar}
+                onChange={(e) => setProfileAvatar(e.target.value)}
+                placeholder="https://example.com/your-photo.jpg"
+              />
+              <p className="text-xs text-gray-500 mt-1">Paste a URL to your profile picture</p>
+              {profileAvatar && (
+                <div className="mt-2">
+                  <img src={profileAvatar} alt="Preview" className="w-16 h-16 rounded-full object-cover border border-gray-200" />
+                </div>
+              )}
+            </div>
+            {(user?.role === "coach" || user?.role === "admin") && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Venmo Link</label>
+                <input
+                  type="url"
+                  className="input-field"
+                  value={profileVenmo}
+                  onChange={(e) => setProfileVenmo(e.target.value)}
+                  placeholder="https://venmo.com/u/your-username"
+                />
+                <p className="text-xs text-gray-500 mt-1">Athletes will see this link to pay you</p>
+              </div>
+            )}
+            <div className="flex gap-3">
+              <button type="submit" disabled={savingProfile} className="btn-primary text-sm py-2">
+                {savingProfile ? "Saving..." : "Save Changes"}
+              </button>
+              <button type="button" onClick={() => setEditingProfile(false)} className="btn-secondary text-sm py-2">
+                Cancel
+              </button>
+            </div>
+          </form>
+        ) : (
+          <div className="space-y-3 text-sm">
+            {user?.avatar_url && (
+              <div className="flex justify-between items-center">
+                <span className="text-gray-600">Photo</span>
+                <img src={user.avatar_url} alt="Profile" className="w-10 h-10 rounded-full object-cover" />
+              </div>
+            )}
+            <div className="flex justify-between">
+              <span className="text-gray-600">Name</span>
+              <span className="font-medium">{user?.full_name}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Email</span>
+              <span className="font-medium">{user?.email}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-gray-600">Role</span>
+              <span className="font-medium capitalize">{user?.role}</span>
+            </div>
+            {user?.venmo_link && (
+              <div className="flex justify-between">
+                <span className="text-gray-600">Venmo</span>
+                <a href={user.venmo_link} target="_blank" rel="noopener noreferrer" className="text-dragonfly hover:underline">
+                  Payment Link
+                </a>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Garmin Connect */}

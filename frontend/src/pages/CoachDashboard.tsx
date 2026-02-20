@@ -368,15 +368,32 @@ const CoachDashboard: React.FC = () => {
 
         {/* Share Button */}
         <div className="mt-4 pt-4 border-t border-gray-200">
-          <button
-            onClick={handleShare}
-            disabled={sharing || selectedWorkouts.size === 0 || !selectedAthlete || (connectionCheck !== null && !connectionCheck.is_connected)}
-            className="btn-primary w-full sm:w-auto"
-          >
-            {sharing
-              ? "Sharing..."
-              : `Share ${selectedWorkouts.size} workout${selectedWorkouts.size !== 1 ? "s" : ""} with athlete`}
-          </button>
+          <div className="relative group inline-block w-full sm:w-auto">
+            <button
+              onClick={handleShare}
+              disabled={sharing || selectedWorkouts.size === 0 || !selectedAthlete || (connectionCheck !== null && !connectionCheck.is_connected)}
+              className="btn-primary w-full sm:w-auto"
+            >
+              {sharing
+                ? "Sharing..."
+                : `Share ${selectedWorkouts.size} workout${selectedWorkouts.size !== 1 ? "s" : ""} with athlete`}
+            </button>
+            {!selectedAthlete && selectedWorkouts.size > 0 && (
+              <p className="text-sm text-amber-600 mt-2">
+                Select an athlete from "My Athletes" above to share workouts with them.
+              </p>
+            )}
+            {selectedAthlete && selectedWorkouts.size === 0 && (
+              <p className="text-sm text-amber-600 mt-2">
+                Select one or more workouts from the list above to share.
+              </p>
+            )}
+            {!selectedAthlete && selectedWorkouts.size === 0 && (
+              <p className="text-sm text-gray-500 mt-2">
+                Select an athlete and one or more workouts to enable sharing.
+              </p>
+            )}
+          </div>
           {selectedAthlete && connectionCheck && !connectionCheck.is_connected && (
             <p className="text-sm text-red-600 mt-2">
               Cannot share — athlete's Garmin connection has issues. See recommendations above.

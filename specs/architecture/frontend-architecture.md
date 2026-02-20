@@ -1,7 +1,7 @@
 # Frontend Architecture
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-02-17  
+**Version:** v1.1.0  
+**Last Updated:** 2025-02-19  
 **Author:** Development Team  
 **Review Status:** Approved
 
@@ -57,7 +57,7 @@ frontend/src/
 │   ├── RegisterPage.tsx
 │   └── SettingsPage.tsx
 ├── services/          # API and external services
-│   └── api.ts
+│   └── api.ts         # Auth, Admin, Coach, Athlete, Garmin, Messaging, Public APIs
 ├── types/             # TypeScript type definitions
 ├── utils/             # Utility functions
 ├── hooks/             # Custom React hooks

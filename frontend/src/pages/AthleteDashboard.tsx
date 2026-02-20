@@ -82,7 +82,12 @@ const AthleteDashboard: React.FC = () => {
     }
   };
 
-  const handleRemove = async (id: number) => {
+  const handleRemove = async (id: number, workoutStatus: string) => {
+    if (workoutStatus === "pending") {
+      if (!window.confirm("This workout has not been imported yet. Are you sure you want to remove it?")) {
+        return;
+      }
+    }
     try {
       await athleteAPI.removeWorkout(id);
       toast.success("Workout removed");
@@ -111,15 +116,27 @@ const AthleteDashboard: React.FC = () => {
             Ready to Import ({pendingWorkouts.length})
           </h2>
           {pendingWorkouts.length > 0 && (
-            <button
-              onClick={handleImport}
-              disabled={importing || selectedIds.size === 0 || !user?.garmin_connected}
-              className="btn-primary text-sm py-2"
-            >
-              {importing
-                ? "Importing..."
-                : `Import ${selectedIds.size} selected`}
-            </button>
+            <div className="text-right">
+              <button
+                onClick={handleImport}
+                disabled={importing || selectedIds.size === 0 || !user?.garmin_connected}
+                className="btn-primary text-sm py-2"
+              >
+                {importing
+                  ? "Importing..."
+                  : `Import ${selectedIds.size} selected`}
+              </button>
+              {!user?.garmin_connected && selectedIds.size > 0 && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Connect your Garmin account in Settings to import workouts.
+                </p>
+              )}
+              {user?.garmin_connected && selectedIds.size === 0 && (
+                <p className="text-xs text-amber-600 mt-1">
+                  Select workouts above to import them to your Garmin.
+                </p>
+              )}
+            </div>
           )}
         </div>
 
@@ -169,6 +186,12 @@ const AthleteDashboard: React.FC = () => {
                   }`}>
                     {w.status}
                   </span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); handleRemove(w.id, w.status); }}
+                    className="text-xs text-gray-400 hover:text-red-600 transition-colors ml-1"
+                  >
+                    Remove
+                  </button>
                 </div>
               </label>
             ))}
@@ -200,7 +223,7 @@ const AthleteDashboard: React.FC = () => {
                   {w.workout_type}
                 </span>
                 <button
-                  onClick={() => handleRemove(w.id)}
+                  onClick={() => handleRemove(w.id, w.status)}
                   className="text-xs text-gray-400 hover:text-red-600 transition-colors"
                 >
                   Remove

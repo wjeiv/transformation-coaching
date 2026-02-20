@@ -1,7 +1,7 @@
 # Dashboards Feature Specification
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-02-17  
+**Version:** v1.1.0  
+**Last Updated:** 2025-02-19  
 **Author:** Product Team  
 **Review Status:** Approved
 
@@ -16,18 +16,23 @@ The dashboard system provides role-based interfaces tailored to the specific nee
 - I want to manage all users so I can maintain the system
 - I want to view contact submissions so I can respond to inquiries
 - I want to monitor API usage so I can optimize performance
+- I want to download a database backup so I can safeguard data
 
 ### As a coach...
 - I want to see my athlete roster so I can manage my clients
 - I want quick access to recent shares so I can track activities
 - I want to view workout statistics so I can analyze performance
 - I want to share workouts quickly so I can save time
+- I want to see a hint when sharing is disabled so I know what to do
 
 ### As an athlete...
 - I want to see my shared workouts so I can stay updated
 - I want to view my progress so I can track improvements
 - I want to import workouts easily so I can follow my plan
 - I want to communicate with my coach so I can get guidance
+- I want to see a hint when importing is disabled so I know what to do
+- I want to delete pending workouts with a warning so I don't lose data accidentally
+- I want to pay my coach via Venmo so payment is easy
 
 ## Feature Requirements
 
@@ -46,6 +51,7 @@ The dashboard system provides role-based interfaces tailored to the specific nee
   - View recent activity
   - System maintenance
   - Generate reports
+  - Download database backup (JSON export)
 - User management widget:
   - Recent user signups
   - Users needing attention

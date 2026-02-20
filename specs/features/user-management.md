@@ -1,7 +1,7 @@
 # User Management Feature Specification
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-02-17  
+**Version:** v1.1.0  
+**Last Updated:** 2025-02-19  
 **Author:** Product Team  
 **Review Status:** Approved
 
@@ -23,11 +23,16 @@ The user management system provides comprehensive control over user accounts, ro
 - I want to invite athletes so I can expand my client base
 - I want to view athlete progress so I can adjust programs
 - I want to remove athletes so I can manage my roster
+- I want to set a profile picture and Venmo link so athletes can find and pay me
+- I want to message my athletes so I can give feedback
 
 ### As an athlete...
 - I want to view my profile so I can keep it updated
 - I want to select a coach so I can start training
 - I want to view my progress so I can track improvements
+- I want to set a profile picture so others can recognize me
+- I want to message my coach so I can ask questions
+- I want to see my coach's Venmo link so I can pay them easily
 
 ## Feature Requirements
 
@@ -101,11 +106,13 @@ The user management system provides comprehensive control over user accounts, ro
   - Contact information
   - Role-specific details
   - Account settings
-- Avatar upload:
-  - Image preview
-  - Crop functionality
-  - File size limit (5MB)
-  - Format validation (JPG, PNG, WebP)
+  - Venmo payment link (coaches)
+- Avatar/profile picture:
+  - Image URL input with preview
+  - Display in profile and navigation
+- Venmo link (coaches):
+  - URL input field in profile settings
+  - Visible to linked athletes on coach listing
 - Email change process:
   - Current password required
   - Verification email sent
@@ -378,7 +385,7 @@ POST /api/v1/coach/athletes/invite
 GET /api/v1/athlete/coaches
   auth: athlete
   response:
-    coaches: Coach[]
+    coaches: Coach[]  # includes venmo_link
     available_spots: number
 
 POST /api/v1/athlete/coach/{id}
@@ -387,6 +394,55 @@ POST /api/v1/athlete/coach/{id}
     message: string
   response:
     connection: Connection
+
+PUT /api/v1/auth/me
+  auth: required
+  request:
+    full_name?: string
+    avatar_url?: string
+    venmo_link?: string
+  response:
+    user: UserResponse
+
+POST /api/v1/messages/send
+  auth: required
+  request:
+    recipient_id: int
+    subject?: string
+    body: string
+  response:
+    message: MessageResponse
+
+GET /api/v1/messages/inbox
+  auth: required
+  query:
+    unread_only?: boolean
+    skip?: number
+    limit?: number
+  response:
+    messages: MessageResponse[]
+    total: number
+
+GET /api/v1/messages/sent
+  auth: required
+  response:
+    messages: MessageResponse[]
+    total: number
+
+PUT /api/v1/messages/{id}/read
+  auth: required
+  response:
+    status: ok
+
+GET /api/v1/messages/coaches
+  auth: required
+  response:
+    recipients: [{id, full_name, email}]
+
+GET /api/v1/admin/backup
+  auth: admin
+  response:
+    JSON file download (streaming)
 ```
 
 ### Database Schema

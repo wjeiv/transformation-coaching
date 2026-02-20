@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
 
-from app.api import admin, athlete, auth, coach, garmin, public
+from app.api import admin, athlete, auth, coach, garmin, messaging, public
 from app.core.config import settings
 from app.core.database import get_db, init_db, async_session
 from app.core.security import get_password_hash
@@ -21,6 +21,7 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Transformation Coaching API...")
     await init_db()
     # await create_first_admin()  # Disabled due to bcrypt issue - create manually via API
+    await seed_default_users()
     yield
     logger.info("Shutting down Transformation Coaching API...")
 
@@ -41,6 +42,44 @@ async def create_first_admin():
             session.add(admin_user)
             await session.commit()
             logger.info(f"Created first admin account: {settings.FIRST_ADMIN_EMAIL}")
+
+
+async def seed_default_users():
+    """Seed default coach and athlete if they don't exist."""
+    async with async_session() as session:
+        # Create coach: Bill Coach
+        coach_result = await session.execute(
+            select(User).where(User.email == "wjeiv4@gmail.com")
+        )
+        coach = coach_result.scalar_one_or_none()
+        if not coach:
+            coach = User(
+                email="wjeiv4@gmail.com",
+                hashed_password=get_password_hash("FFester1!"),
+                full_name="Bill Coach",
+                role=UserRole.COACH,
+            )
+            session.add(coach)
+            await session.flush()
+            logger.info("Created default coach: Bill Coach (wjeiv4@gmail.com)")
+
+        # Create athlete: Gretchen Hickey linked to Bill Coach
+        athlete_result = await session.execute(
+            select(User).where(User.email == "gretchenhickey6399@gmail.com")
+        )
+        athlete = athlete_result.scalar_one_or_none()
+        if not athlete:
+            athlete = User(
+                email="gretchenhickey6399@gmail.com",
+                hashed_password=get_password_hash("FFester1!"),
+                full_name="Gretchen Hickey",
+                role=UserRole.ATHLETE,
+                coach_id=coach.id,
+            )
+            session.add(athlete)
+            logger.info("Created default athlete: Gretchen Hickey linked to Bill Coach")
+
+        await session.commit()
 
 
 app = FastAPI(
@@ -76,6 +115,7 @@ app.include_router(admin.router, prefix=settings.API_V1_STR)
 app.include_router(coach.router, prefix=settings.API_V1_STR)
 app.include_router(athlete.router, prefix=settings.API_V1_STR)
 app.include_router(garmin.router, prefix=settings.API_V1_STR)
+app.include_router(messaging.router, prefix=settings.API_V1_STR)
 app.include_router(public.router, prefix=settings.API_V1_STR)
 
 

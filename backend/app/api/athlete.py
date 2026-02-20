@@ -37,6 +37,7 @@ async def list_available_coaches(
             full_name=c.full_name,
             email=c.email,
             avatar_url=c.avatar_url,
+            venmo_link=c.venmo_link,
         )
         for c in coaches
     ]

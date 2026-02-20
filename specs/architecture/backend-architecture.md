@@ -1,7 +1,7 @@
 # Backend Architecture
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-02-17  
+**Version:** v1.1.0  
+**Last Updated:** 2025-02-19  
 **Author:** Development Team  
 **Review Status:** Approved
 
@@ -44,11 +44,12 @@ graph TB
 backend/
 ├── app/
 │   ├── api/                 # API route handlers
-│   │   ├── admin.py        # Admin endpoints
+│   │   ├── admin.py        # Admin endpoints (incl. database backup)
 │   │   ├── athlete.py      # Athlete endpoints
-│   │   ├── auth.py         # Authentication endpoints
+│   │   ├── auth.py         # Authentication + profile update endpoints
 │   │   ├── coach.py        # Coach endpoints
 │   │   ├── garmin.py       # Garmin integration
+│   │   ├── messaging.py    # Coach-athlete messaging
 │   │   ├── public.py       # Public endpoints
 │   │   └── deps.py         # Dependencies
 │   ├── core/               # Core functionality
@@ -77,6 +78,8 @@ async def lifespan(app: FastAPI):
     await init_db()
     # Create first admin
     await create_first_admin()
+    # Seed default users (coach + athlete)
+    await seed_default_users()
     yield
     # Cleanup
 ```

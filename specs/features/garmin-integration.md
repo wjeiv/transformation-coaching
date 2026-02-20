@@ -1,7 +1,7 @@
 # Garmin Integration Feature Specification
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-02-17  
+**Version:** v1.1.0  
+**Last Updated:** 2025-02-19  
 **Author:** Product Team  
 **Review Status:** Approved
 
@@ -167,6 +167,10 @@ The Garmin Connect integration enables seamless workout sharing between coaches 
   - Import as template
   - Modify before import
   - Import to calendar
+- Workout removal:
+  - Athletes can remove pending (not yet imported) workouts with a warning confirmation
+  - Athletes can remove already-imported workouts without warning
+  - Contextual hints when import button is disabled (no Garmin connection or no workouts selected)
 
 **Acceptance Criteria**:
 - Import completes successfully

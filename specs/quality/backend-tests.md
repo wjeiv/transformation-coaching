@@ -1,7 +1,7 @@
 # Backend Testing Guide
 
-**Version:** v1.0.0  
-**Last Updated:** 2025-02-17  
+**Version:** v1.1.0  
+**Last Updated:** 2025-02-19  
 **Author**: Backend Team  
 **Review Status**: Approved
 
@@ -18,19 +18,25 @@ backend/
 ├── tests/
 │   ├── __init__.py
 │   ├── conftest.py              # Test configuration and fixtures
-│   ├── unit/                    # Unit tests
-│   │   ├── test_services/
-│   │   ├── test_utils/
-│   │   └── test_models/
-│   ├── integration/             # Integration tests
-│   │   ├── test_api/
-│   │   ├── test_database/
-│   │   └── test_external/
-│   ├── e2e/                     # End-to-end tests
-│   └── performance/             # Performance tests
+│   ├── test_admin.py            # Admin API tests (stats, users, CRUD)
+│   ├── test_athlete.py          # Athlete API tests (coaches, workouts, delete)
+│   ├── test_auth.py             # Auth API tests (register, login, token)
+│   ├── test_backup.py           # Admin backup/download tests
+│   ├── test_coach.py            # Coach API tests (athletes, linking)
+│   ├── test_garmin_integration.py # Garmin real-credential tests (skipped)
+│   ├── test_messaging.py        # Messaging API tests (send, inbox, read)
+│   ├── test_profile.py          # Profile update tests (name, avatar, venmo)
+│   ├── test_public.py           # Public API tests (contact form)
+│   └── test_security.py         # Security utils (hash, JWT, encryption)
 ├── pytest.ini                  # pytest configuration
-└── requirements-test.txt        # Test dependencies
+└── requirements.txt            # All dependencies including test
 ```
+
+### Test Results (as of v1.1.0)
+
+- **67 passed**, 5 skipped (Garmin integration tests require real credentials)
+- Test database: SQLite (aiosqlite) for isolation
+- All new features covered: messaging, profile updates, backup, athlete workout deletion
 
 ## Test Configuration
 

@@ -2,16 +2,8 @@ import React, { Fragment, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
-const DragonflySVG: React.FC<{ className?: string }> = ({ className }) => (
-  <svg className={className} viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <ellipse cx="32" cy="18" rx="6" ry="8" fill="currentColor" opacity="0.9" />
-    <ellipse cx="20" cy="24" rx="14" ry="5" fill="currentColor" opacity="0.5" transform="rotate(-20 20 24)" />
-    <ellipse cx="44" cy="24" rx="14" ry="5" fill="currentColor" opacity="0.5" transform="rotate(20 44 24)" />
-    <ellipse cx="18" cy="18" rx="12" ry="4" fill="currentColor" opacity="0.4" transform="rotate(-35 18 18)" />
-    <ellipse cx="46" cy="18" rx="12" ry="4" fill="currentColor" opacity="0.4" transform="rotate(35 46 18)" />
-    <line x1="32" y1="26" x2="32" y2="56" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" />
-    <circle cx="32" cy="14" r="3" fill="currentColor" />
-  </svg>
+const Logo: React.FC<{ className?: string }> = ({ className }) => (
+  <img src="/coach-trans1.png" alt="Transformation Coaching" className={className} />
 );
 
 const Layout: React.FC = () => {
@@ -62,7 +54,7 @@ const Layout: React.FC = () => {
           <div className="flex justify-between h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center gap-2 text-dragonfly hover:text-dragonfly-dark transition-colors">
-                <DragonflySVG className="h-8 w-8" />
+                <Logo className="h-8 w-8" />
                 <span className="font-display font-bold text-lg hidden sm:block">
                   Transformation Coaching
                 </span>
@@ -163,7 +155,7 @@ const Layout: React.FC = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4">
             <div className="flex items-center gap-2 text-white">
-              <DragonflySVG className="h-6 w-6" />
+              <Logo className="h-6 w-6" />
               <span className="font-display font-semibold">Transformation Coaching</span>
             </div>
             <p className="text-sm">&copy; {new Date().getFullYear()} Transformation Coaching. All rights reserved.</p>

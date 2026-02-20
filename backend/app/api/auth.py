@@ -13,6 +13,7 @@ from app.api.schemas import (
     Token,
     TokenRefresh,
     UserResponse,
+    UserUpdate,
 )
 from app.core.config import settings
 from app.core.database import get_db
@@ -278,6 +279,44 @@ async def get_me(
         role=current_user.role.value,
         is_active=current_user.is_active,
         avatar_url=current_user.avatar_url,
+        venmo_link=current_user.venmo_link,
+        coach_id=current_user.coach_id,
+        created_at=current_user.created_at,
+        last_login=current_user.last_login,
+        garmin_connected=garmin_connected,
+    )
+
+
+@router.put("/me", response_model=UserResponse)
+async def update_my_profile(
+    data: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Update current user's profile (name, avatar, venmo link)."""
+    if data.full_name is not None:
+        current_user.full_name = data.full_name
+    if data.avatar_url is not None:
+        current_user.avatar_url = data.avatar_url
+    if data.venmo_link is not None:
+        current_user.venmo_link = data.venmo_link
+
+    await db.flush()
+
+    from app.models.user import GarminCredentials
+    result = await db.execute(
+        select(GarminCredentials.is_connected).where(GarminCredentials.user_id == current_user.id)
+    )
+    garmin_connected = result.scalar_one_or_none() or False
+
+    return UserResponse(
+        id=current_user.id,
+        email=current_user.email,
+        full_name=current_user.full_name,
+        role=current_user.role.value,
+        is_active=current_user.is_active,
+        avatar_url=current_user.avatar_url,
+        venmo_link=current_user.venmo_link,
         coach_id=current_user.coach_id,
         created_at=current_user.created_at,
         last_login=current_user.last_login,

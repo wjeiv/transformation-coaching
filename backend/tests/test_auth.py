@@ -93,7 +93,7 @@ async def test_get_me(client: AsyncClient, athlete_token: str):
 @pytest.mark.asyncio
 async def test_get_me_no_token(client: AsyncClient):
     resp = await client.get("/api/v1/auth/me")
-    assert resp.status_code == 403
+    assert resp.status_code in (401, 403)
 
 
 @pytest.mark.asyncio

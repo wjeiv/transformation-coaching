@@ -96,9 +96,32 @@ const AdminDashboard: React.FC = () => {
     }
   };
 
+  const handleDownloadBackup = async () => {
+    try {
+      const resp = await adminAPI.downloadBackup();
+      const blob = new Blob([resp.data], { type: "application/json" });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `tc_backup_${new Date().toISOString().slice(0, 10)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      toast.success("Backup downloaded successfully");
+    } catch {
+      toast.error("Failed to download backup");
+    }
+  };
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="font-display text-2xl font-bold text-gray-900 mb-6">Admin Dashboard</h1>
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="font-display text-2xl font-bold text-gray-900">Admin Dashboard</h1>
+        <button onClick={handleDownloadBackup} className="btn-secondary text-sm py-2">
+          Download Backup
+        </button>
+      </div>
 
       {/* Stats Cards */}
       {stats && (

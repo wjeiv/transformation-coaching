@@ -1,7 +1,11 @@
+import json
+import io
+from datetime import datetime, timezone
 from typing import Optional
 
 from fastapi import APIRouter, Depends, HTTPException, Query, status
-from sqlalchemy import func, select
+from fastapi.responses import StreamingResponse
+from sqlalchemy import func, select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 
@@ -20,9 +24,11 @@ from app.models.user import (
     ActivityLog,
     ContactRequest,
     GarminCredentials,
+    Message,
     SharedWorkout,
     User,
     UserRole,
+    Workout,
 )
 
 router = APIRouter(prefix="/admin", tags=["admin"])
@@ -75,6 +81,7 @@ async def get_admin_stats(
                 role=u.role.value,
                 is_active=u.is_active,
                 avatar_url=u.avatar_url,
+                venmo_link=u.venmo_link,
                 coach_id=u.coach_id,
                 created_at=u.created_at,
                 last_login=u.last_login,
@@ -124,6 +131,7 @@ async def list_users(
                 role=u.role.value,
                 is_active=u.is_active,
                 avatar_url=u.avatar_url,
+                venmo_link=u.venmo_link,
                 coach_id=u.coach_id,
                 created_at=u.created_at,
                 last_login=u.last_login,
@@ -166,6 +174,7 @@ async def create_user(
         role=user.role.value,
         is_active=user.is_active,
         avatar_url=user.avatar_url,
+        venmo_link=user.venmo_link,
         coach_id=user.coach_id,
         created_at=user.created_at,
         last_login=user.last_login,
@@ -214,6 +223,7 @@ async def update_user(
         role=user.role.value,
         is_active=user.is_active,
         avatar_url=user.avatar_url,
+        venmo_link=user.venmo_link,
         coach_id=user.coach_id,
         created_at=user.created_at,
         last_login=user.last_login,
@@ -270,3 +280,104 @@ async def mark_contact_read(
     contact.is_read = True
     await db.flush()
     return {"status": "ok"}
+
+
+@router.get("/backup")
+async def download_database_backup(
+    admin: User = Depends(get_current_admin),
+    db: AsyncSession = Depends(get_db),
+):
+    """Download a JSON backup of the entire database."""
+    backup = {"backup_timestamp": datetime.now(timezone.utc).isoformat(), "data": {}}
+
+    # Export users (excluding hashed passwords for security)
+    users_result = await db.execute(select(User).order_by(User.id))
+    users = users_result.scalars().all()
+    backup["data"]["users"] = [
+        {
+            "id": u.id,
+            "email": u.email,
+            "full_name": u.full_name,
+            "role": u.role.value,
+            "is_active": u.is_active,
+            "avatar_url": u.avatar_url,
+            "venmo_link": u.venmo_link,
+            "coach_id": u.coach_id,
+            "created_at": u.created_at.isoformat() if u.created_at else None,
+            "last_login": u.last_login.isoformat() if u.last_login else None,
+        }
+        for u in users
+    ]
+
+    # Export workouts
+    workouts_result = await db.execute(select(Workout).order_by(Workout.id))
+    workouts = workouts_result.scalars().all()
+    backup["data"]["workouts"] = [
+        {
+            "id": w.id,
+            "garmin_workout_id": w.garmin_workout_id,
+            "coach_id": w.coach_id,
+            "workout_name": w.workout_name,
+            "workout_type": w.workout_type,
+            "description": w.description,
+            "created_at": w.created_at.isoformat() if w.created_at else None,
+        }
+        for w in workouts
+    ]
+
+    # Export shared workouts
+    shared_result = await db.execute(select(SharedWorkout).order_by(SharedWorkout.id))
+    shared = shared_result.scalars().all()
+    backup["data"]["shared_workouts"] = [
+        {
+            "id": s.id,
+            "workout_id": s.workout_id,
+            "coach_id": s.coach_id,
+            "athlete_id": s.athlete_id,
+            "status": s.status,
+            "shared_at": s.shared_at.isoformat() if s.shared_at else None,
+            "imported_at": s.imported_at.isoformat() if s.imported_at else None,
+        }
+        for s in shared
+    ]
+
+    # Export messages
+    msgs_result = await db.execute(select(Message).order_by(Message.id))
+    msgs = msgs_result.scalars().all()
+    backup["data"]["messages"] = [
+        {
+            "id": m.id,
+            "sender_id": m.sender_id,
+            "recipient_id": m.recipient_id,
+            "subject": m.subject,
+            "body": m.body,
+            "is_read": m.is_read,
+            "created_at": m.created_at.isoformat() if m.created_at else None,
+        }
+        for m in msgs
+    ]
+
+    # Export contact requests
+    contacts_result = await db.execute(select(ContactRequest).order_by(ContactRequest.id))
+    contacts = contacts_result.scalars().all()
+    backup["data"]["contact_requests"] = [
+        {
+            "id": c.id,
+            "name": c.name,
+            "email": c.email,
+            "phone": c.phone,
+            "message": c.message,
+            "is_read": c.is_read,
+            "created_at": c.created_at.isoformat() if c.created_at else None,
+        }
+        for c in contacts
+    ]
+
+    json_bytes = json.dumps(backup, indent=2, default=str).encode("utf-8")
+    timestamp = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+
+    return StreamingResponse(
+        io.BytesIO(json_bytes),
+        media_type="application/json",
+        headers={"Content-Disposition": f'attachment; filename="tc_backup_{timestamp}.json"'},
+    )

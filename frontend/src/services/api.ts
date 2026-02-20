@@ -64,6 +64,11 @@ export const authAPI = {
   googleCallback: (code: string) =>
     api.post("/auth/google/callback", { code }),
   getMe: () => api.get("/auth/me"),
+  updateMe: (data: {
+    full_name?: string;
+    avatar_url?: string;
+    venmo_link?: string;
+  }) => api.put("/auth/me", data),
   refresh: (refresh_token: string) =>
     api.post("/auth/refresh", { refresh_token }),
 };
@@ -97,6 +102,8 @@ export const adminAPI = {
     api.get("/admin/contacts", { params: { unread_only: unreadOnly } }),
   markContactRead: (contactId: number) =>
     api.put(`/admin/contacts/${contactId}/read`),
+  downloadBackup: () =>
+    api.get("/admin/backup", { responseType: "blob" }),
 };
 
 // --- Coach ---
@@ -160,6 +167,19 @@ export const publicAPI = {
     phone?: string;
     message: string;
   }) => api.post("/public/contact", data),
+};
+
+// --- Messages ---
+export const messageAPI = {
+  send: (data: { recipient_id: number; subject?: string; body: string }) =>
+    api.post("/messages/send", data),
+  getInbox: (params?: { unread_only?: boolean; skip?: number; limit?: number }) =>
+    api.get("/messages/inbox", { params }),
+  getSent: (params?: { skip?: number; limit?: number }) =>
+    api.get("/messages/sent", { params }),
+  markRead: (messageId: number) =>
+    api.put(`/messages/${messageId}/read`),
+  listRecipients: () => api.get("/messages/coaches"),
 };
 
 export default api;

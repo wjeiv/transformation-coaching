@@ -24,6 +24,7 @@ class User(Base):
     is_active = Column(Boolean, default=True)
     google_id = Column(String(255), unique=True, nullable=True)
     avatar_url = Column(Text, nullable=True)
+    venmo_link = Column(String(255), nullable=True)
     coach_id = Column(Integer, ForeignKey("users.id"), nullable=True)
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
@@ -35,6 +36,8 @@ class User(Base):
     shared_workouts_sent = relationship("SharedWorkout", foreign_keys="SharedWorkout.coach_id", back_populates="coach", cascade="all, delete-orphan")
     shared_workouts_received = relationship("SharedWorkout", foreign_keys="SharedWorkout.athlete_id", back_populates="athlete", cascade="all, delete-orphan")
     activity_logs = relationship("ActivityLog", back_populates="user", cascade="all, delete-orphan")
+    messages_sent = relationship("Message", foreign_keys="Message.sender_id", back_populates="sender", cascade="all, delete-orphan")
+    messages_received = relationship("Message", foreign_keys="Message.recipient_id", back_populates="recipient", cascade="all, delete-orphan")
 
 
 class GarminCredentials(Base):
@@ -99,6 +102,21 @@ class ActivityLog(Base):
     created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
 
     user = relationship("User", back_populates="activity_logs")
+
+
+class Message(Base):
+    __tablename__ = "messages"
+
+    id = Column(Integer, primary_key=True, index=True)
+    sender_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    recipient_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    subject = Column(String(500), nullable=True)
+    body = Column(Text, nullable=False)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
+
+    sender = relationship("User", foreign_keys=[sender_id], back_populates="messages_sent")
+    recipient = relationship("User", foreign_keys=[recipient_id], back_populates="messages_received")
 
 
 class ContactRequest(Base):

@@ -50,6 +50,8 @@ class UserUpdate(BaseModel):
     is_active: Optional[bool] = None
     role: Optional[str] = Field(None, pattern="^(admin|coach|athlete)$")
     coach_id: Optional[int] = None
+    venmo_link: Optional[str] = Field(None, max_length=255)
+    avatar_url: Optional[str] = None
 
 
 class UserResponse(BaseModel):
@@ -59,6 +61,7 @@ class UserResponse(BaseModel):
     role: str
     is_active: bool
     avatar_url: Optional[str] = None
+    venmo_link: Optional[str] = None
     coach_id: Optional[int] = None
     created_at: datetime
     last_login: Optional[datetime] = None
@@ -78,6 +81,7 @@ class CoachResponse(BaseModel):
     full_name: str
     email: str
     avatar_url: Optional[str] = None
+    venmo_link: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -201,3 +205,30 @@ class AdminStats(BaseModel):
     total_workouts_shared: int
     total_contact_requests: int
     recent_logins: List[UserResponse]
+
+
+# --- Message Schemas ---
+class MessageCreate(BaseModel):
+    recipient_id: int
+    subject: Optional[str] = Field(None, max_length=500)
+    body: str = Field(min_length=1, max_length=5000)
+
+
+class MessageResponse(BaseModel):
+    id: int
+    sender_id: int
+    sender_name: str
+    recipient_id: int
+    recipient_name: str
+    subject: Optional[str] = None
+    body: str
+    is_read: bool
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
+
+class MessageListResponse(BaseModel):
+    messages: List[MessageResponse]
+    total: int

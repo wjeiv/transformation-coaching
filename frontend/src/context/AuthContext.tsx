@@ -8,6 +8,7 @@ interface User {
   role: string;
   is_active: boolean;
   avatar_url?: string;
+  venmo_link?: string;
   coach_id?: number;
   created_at: string;
   last_login?: string;
