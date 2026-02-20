@@ -14,11 +14,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy application code
 COPY . .
 
-# Create data directory for SQLite database
+# Create non-root user first
+RUN adduser --disabled-password --gecos '' appuser
+
+# Create data directory for SQLite database and set ownership
 RUN mkdir -p /app/data && chown -R appuser:appuser /app
 
-# Create non-root user
-RUN adduser --disabled-password --gecos '' appuser
 USER appuser
 
 EXPOSE 8000

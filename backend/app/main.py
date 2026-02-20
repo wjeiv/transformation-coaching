@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 async def lifespan(app: FastAPI):
     logger.info("Starting Transformation Coaching API...")
     await init_db()
-    # await create_first_admin()  # Disabled due to bcrypt issue - create manually via API
+    await create_first_admin()  # Bcrypt issue resolved - re-enabled
     await seed_default_users()
     yield
     logger.info("Shutting down Transformation Coaching API...")
