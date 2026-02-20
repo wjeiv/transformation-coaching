@@ -42,18 +42,8 @@ const HomeRedirect: React.FC = () => {
     );
   }
 
-  if (!user) return <LandingPage />;
-
-  switch (user.role) {
-    case "admin":
-      return <Navigate to="/admin" replace />;
-    case "coach":
-      return <Navigate to="/coach" replace />;
-    case "athlete":
-      return <Navigate to="/athlete" replace />;
-    default:
-      return <LandingPage />;
-  }
+  // Always show LandingPage for homepage ("/")
+  return <LandingPage />;
 };
 
 const App: React.FC = () => {
@@ -82,42 +72,10 @@ const App: React.FC = () => {
                 </ProtectedRoute>
               }
             />
-            <Route
-              path="/admin/users"
-              element={
-                <ProtectedRoute roles={["admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/admin/contacts"
-              element={
-                <ProtectedRoute roles={["admin"]}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              }
-            />
 
             {/* Coach routes */}
             <Route
               path="/coach"
-              element={
-                <ProtectedRoute roles={["coach", "admin"]}>
-                  <CoachDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/coach/athletes"
-              element={
-                <ProtectedRoute roles={["coach", "admin"]}>
-                  <CoachDashboard />
-                </ProtectedRoute>
-              }
-            />
-            <Route
-              path="/coach/workouts"
               element={
                 <ProtectedRoute roles={["coach", "admin"]}>
                   <CoachDashboard />

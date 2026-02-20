@@ -2,8 +2,8 @@
 
 ## 📊 Current Status
 ✅ **Admin account exists and is active**
-- Email: admin@transformationcoaching.com
-- Password: admin123
+- Email: admin
+- Password: FFester1!
 - Role: ADMIN
 - Created: 2026-02-19 17:13:32
 
@@ -48,8 +48,8 @@ TypeError: Cannot read property 'token' of undefined
 3. Enter credentials:
    ```json
    {
-     "email": "admin@transformationcoaching.com",
-     "password": "admin123"
+     "email": "admin",
+     "password": "FFester1!"
    }
    ```
 4. Click "Execute" - see detailed response
@@ -68,7 +68,7 @@ TypeError: Cannot read property 'token' of undefined
 ### Issue: "Invalid credentials" (401 Unauthorized)
 **Debug steps**:
 1. Check if user exists: `python debug_auth.py`
-2. Verify password: Should be `admin123`
+2. Verify password: Should be `FFester1!`
 3. Check backend logs for login attempts
 4. Test via API docs
 
@@ -130,8 +130,8 @@ $headers = @{
     "Content-Type" = "application/json"
 }
 $body = @{
-    email = "admin@transformationcoaching.com"
-    password = "admin123"
+    email = "admin"
+    password = "FFester1!"
 } | ConvertTo-Json
 
 Invoke-RestMethod -Uri http://localhost:8000/api/v1/auth/login -Method POST -Headers $headers -Body $body

@@ -49,8 +49,8 @@ async def fix_admin_password():
         print("✅ Admin password hash updated!")
         print()
         print("Login credentials:")
-        print("  Email: admin@transformationcoaching.com")
-        print("  Password: admin123")
+        print("  Email: admin")
+        print("  Password: FFester1!")
         print()
         print("Try logging in again!")
         

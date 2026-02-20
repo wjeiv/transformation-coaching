@@ -46,11 +46,19 @@ class Settings(BaseSettings):
     GARMIN_ENCRYPTION_KEY: str = secrets.token_urlsafe(32)
 
     # First admin account
-    FIRST_ADMIN_EMAIL: str = "admin@transformationcoaching.com"
-    FIRST_ADMIN_PASSWORD: str = "changeme123!"
+    FIRST_ADMIN_EMAIL: str = "admin"
+    FIRST_ADMIN_PASSWORD: str = "FFester1!"
 
     # Rate limiting
     RATE_LIMIT_PER_MINUTE: int = 60
+
+    # Email configuration
+    SMTP_HOST: str = "smtp.gmail.com"
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = "wjeiv4@gmail.com"
+    SMTP_PASSWORD: str = "pitk kyyb mdsa xvez"
+    CONTACT_EMAIL_TO: str = "transformation.coaching26.2@gmail.com"
+    EMAIL_FROM: str = "noreply@transformationcoaching.com"
 
     class Config:
         env_file = "dev.env"

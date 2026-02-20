@@ -40,3 +40,6 @@ aiosqlite==0.20.0
 # Utilities
 python-dotenv==1.0.1
 aiofiles==23.2.1
+
+# Email
+aiosmtplib==3.0.1

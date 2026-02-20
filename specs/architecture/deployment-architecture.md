@@ -390,8 +390,8 @@ SECRET_KEY=your-super-secret-jwt-key-here
 GARMIN_ENCRYPTION_KEY=your-fernet-encryption-key-here
 
 # Admin User
-FIRST_ADMIN_EMAIL=admin@transformationcoaching.com
-FIRST_ADMIN_PASSWORD=very-strong-admin-password
+FIRST_ADMIN_EMAIL=admin
+FIRST_ADMIN_PASSWORD=FFester1!
 
 # OAuth (Optional)
 GOOGLE_CLIENT_ID=your-google-client-id

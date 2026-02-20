@@ -9,8 +9,8 @@
 - **Garmin Connect Integration**: Fully working ✅
 
 ### Admin Account Created
-- **Email**: admin@transformationcoaching.com
-- **Password**: admin123
+- **Email**: admin
+- **Password**: FFester1!
 - **Role**: Administrator
 
 ## 🎯 Quick Start

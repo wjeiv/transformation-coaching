@@ -14,8 +14,14 @@ services:
       DATABASE_URL_SYNC: sqlite:///./data/app.db
       SECRET_KEY: dev-secret-key-change-in-production
       GARMIN_ENCRYPTION_KEY: dev-encryption-key-change-in-production
-      FIRST_ADMIN_EMAIL: admin@transformationcoaching.com
-      FIRST_ADMIN_PASSWORD: changeme123!
+      FIRST_ADMIN_EMAIL: admin
+      FIRST_ADMIN_PASSWORD: FFester1!
+      SMTP_HOST: smtp.gmail.com
+      SMTP_PORT: 587
+      SMTP_USERNAME: wjeiv4@gmail.com
+      SMTP_PASSWORD: pitk kyyb mdsa xvez
+      CONTACT_EMAIL_TO: transformation.coaching26.2@gmail.com
+      EMAIL_FROM: noreply@transformationcoaching.com
       BACKEND_CORS_ORIGINS: '["http://localhost:3000","http://localhost:8000"]'
 
   frontend:

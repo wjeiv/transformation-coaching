@@ -1,6 +1,7 @@
 import React, { Fragment, useState } from "react";
 import { Link, Outlet, useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
+import { APP_VERSION, BUILD_DATE } from "../version";
 
 const Logo: React.FC<{ className?: string }> = ({ className }) => (
   <img src="/coach-trans1.png" alt="Transformation Coaching" className={className} />
@@ -23,15 +24,11 @@ const Layout: React.FC = () => {
       case "admin":
         return [
           { to: "/admin", label: "Dashboard" },
-          { to: "/admin/users", label: "Users" },
-          { to: "/admin/contacts", label: "Contact Requests" },
           { to: "/settings", label: "Settings" },
         ];
       case "coach":
         return [
           { to: "/coach", label: "Dashboard" },
-          { to: "/coach/athletes", label: "Athletes" },
-          { to: "/coach/workouts", label: "Workouts" },
           { to: "/settings", label: "Settings" },
         ];
       case "athlete":
@@ -158,7 +155,11 @@ const Layout: React.FC = () => {
               <Logo className="h-6 w-6" />
               <span className="font-display font-semibold">Transformation Coaching</span>
             </div>
-            <p className="text-sm">&copy; {new Date().getFullYear()} Transformation Coaching. All rights reserved.</p>
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-sm">
+              <span>v{APP_VERSION}</span>
+              <span>Built: {BUILD_DATE}</span>
+              <span>&copy; 2026 Transformation Coaching. All rights reserved.</span>
+            </div>
           </div>
         </div>
       </footer>

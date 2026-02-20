@@ -85,7 +85,7 @@ This starts:
 
 - **Frontend**: http://localhost:3000
 - **API docs**: http://localhost:8000/docs
-- **Default admin**: `admin@transformationcoaching.com` / `changeme123!`
+- **Default admin**: `admin` / `FFester1!`
 
 > **Important**: Change the default admin password immediately after first login.
 
@@ -98,8 +98,8 @@ Create `backend/.env` from `backend/.env.example`:
 | `DATABASE_URL` | PostgreSQL connection string | `postgresql+asyncpg://tc_user:tc_password@db:5432/transformation_coaching` |
 | `SECRET_KEY` | JWT signing key | (generate with `openssl rand -hex 32`) |
 | `GARMIN_ENCRYPTION_KEY` | Fernet key for credential encryption | (generate with `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"`) |
-| `FIRST_ADMIN_EMAIL` | Initial admin account email | `admin@transformationcoaching.com` |
-| `FIRST_ADMIN_PASSWORD` | Initial admin account password | `changeme123!` |
+| `FIRST_ADMIN_EMAIL` | Initial admin account email | `admin` |
+| `FIRST_ADMIN_PASSWORD` | Initial admin account password | `FFester1!` |
 | `GOOGLE_CLIENT_ID` | Google OAuth client ID (optional) | — |
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret (optional) | — |
 | `CORS_ORIGINS` | Allowed CORS origins | `http://localhost:3000` |

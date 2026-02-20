@@ -214,95 +214,97 @@ const SettingsPage: React.FC = () => {
       </div>
 
       {/* Garmin Connect */}
-      <div className="card">
-        <h2 className="text-lg font-semibold mb-2">Garmin Connect</h2>
-        <p className="text-sm text-gray-600 mb-4">
-          Connect your Garmin account to sync workouts. Your credentials are encrypted and stored securely.
-        </p>
-
-        {/* How it works */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
-          <h3 className="text-sm font-semibold text-blue-800 mb-2">How Garmin Integration Works</h3>
-          <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
-            <li>Enter your Garmin Connect email and password below</li>
-            <li>We verify connectivity to your Garmin account immediately</li>
-            <li>Your credentials are encrypted with AES-256 and stored securely</li>
-            <li>
-              {user?.role === "coach"
-                ? "Your workouts will appear in the Coach Dashboard for sharing"
-                : "Your coach can share workouts that you can import to your Garmin account"}
-            </li>
-            <li>You can disconnect at any time — credentials are permanently deleted</li>
-          </ol>
-          <p className="text-xs text-blue-600 mt-2">
-            <strong>Note:</strong> Garmin does not offer a public OAuth API for workout management.
-            We use the same authentication method as the official Garmin Connect app.
-            Your password is never stored in plain text.
+      {user?.role !== "admin" && (
+        <div className="card">
+          <h2 className="text-lg font-semibold mb-2">Garmin Connect</h2>
+          <p className="text-sm text-gray-600 mb-4">
+            Connect your Garmin account to sync workouts. Your credentials are encrypted and stored securely.
           </p>
-        </div>
 
-        {garminStatus?.is_connected ? (
-          <div>
-            <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
-              <div className="flex items-center gap-2 text-green-700 font-medium text-sm">
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                Connected to Garmin Connect
-              </div>
-              {garminStatus.garmin_email && (
-                <p className="text-sm text-green-600 mt-1">Account: {garminStatus.garmin_email}</p>
-              )}
-              {garminStatus.last_sync && (
-                <p className="text-xs text-green-500 mt-1">
-                  Last verified: {new Date(garminStatus.last_sync).toLocaleString()}
-                </p>
-              )}
-            </div>
-            <div className="flex gap-3">
-              <button onClick={handleTest} disabled={testing} className="btn-secondary text-sm py-2">
-                {testing ? "Testing..." : "Test Connection"}
-              </button>
-              <button onClick={handleDisconnect} className="btn-danger text-sm py-2">
-                Disconnect
-              </button>
-            </div>
+          {/* How it works */}
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+            <h3 className="text-sm font-semibold text-blue-800 mb-2">How Garmin Integration Works</h3>
+            <ol className="text-xs text-blue-700 space-y-1 list-decimal list-inside">
+              <li>Enter your Garmin Connect email and password below</li>
+              <li>We verify connectivity to your Garmin account immediately</li>
+              <li>Your credentials are encrypted with AES-256 and stored securely</li>
+              <li>
+                {user?.role === "coach"
+                  ? "Your workouts will appear in the Coach Dashboard for sharing"
+                  : "Your coach can share workouts that you can import to your Garmin account"}
+              </li>
+              <li>You can disconnect at any time — credentials are permanently deleted</li>
+            </ol>
+            <p className="text-xs text-blue-600 mt-2">
+              <strong>Note:</strong> Garmin does not offer a public OAuth API for workout management.
+              We use the same authentication method as the official Garmin Connect app.
+              Your password is never stored in plain text.
+            </p>
           </div>
-        ) : (
-          <form onSubmit={handleConnect} className="space-y-4">
-            {garminStatus?.error_message && (
-              <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
-                {garminStatus.error_message}
+
+          {garminStatus?.is_connected ? (
+            <div>
+              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-4">
+                <div className="flex items-center gap-2 text-green-700 font-medium text-sm">
+                  <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Connected to Garmin Connect
+                </div>
+                {garminStatus.garmin_email && (
+                  <p className="text-sm text-green-600 mt-1">Account: {garminStatus.garmin_email}</p>
+                )}
+                {garminStatus.last_sync && (
+                  <p className="text-xs text-green-500 mt-1">
+                    Last verified: {new Date(garminStatus.last_sync).toLocaleString()}
+                  </p>
+                )}
               </div>
-            )}
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Garmin Connect Email</label>
-              <input
-                type="email"
-                required
-                className="input-field"
-                value={garminEmail}
-                onChange={(e) => setGarminEmail(e.target.value)}
-                placeholder="your-garmin-email@example.com"
-              />
+              <div className="flex gap-3">
+                <button onClick={handleTest} disabled={testing} className="btn-secondary text-sm py-2">
+                  {testing ? "Testing..." : "Test Connection"}
+                </button>
+                <button onClick={handleDisconnect} className="btn-danger text-sm py-2">
+                  Disconnect
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Garmin Connect Password</label>
-              <input
-                type="password"
-                required
-                className="input-field"
-                value={garminPassword}
-                onChange={(e) => setGarminPassword(e.target.value)}
-                placeholder="Your Garmin Connect password"
-              />
-            </div>
-            <button type="submit" disabled={connecting} className="btn-primary w-full">
-              {connecting ? "Connecting..." : "Connect Garmin Account"}
-            </button>
-          </form>
-        )}
-      </div>
+          ) : (
+            <form onSubmit={handleConnect} className="space-y-4">
+              {garminStatus?.error_message && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 text-sm text-red-700">
+                  {garminStatus.error_message}
+                </div>
+              )}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Garmin Connect Email</label>
+                <input
+                  type="email"
+                  required
+                  className="input-field"
+                  value={garminEmail}
+                  onChange={(e) => setGarminEmail(e.target.value)}
+                  placeholder="your-garmin-email@example.com"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Garmin Connect Password</label>
+                <input
+                  type="password"
+                  required
+                  className="input-field"
+                  value={garminPassword}
+                  onChange={(e) => setGarminPassword(e.target.value)}
+                  placeholder="Your Garmin Connect password"
+                />
+              </div>
+              <button type="submit" disabled={connecting} className="btn-primary w-full">
+                {connecting ? "Connecting..." : "Connect Garmin Account"}
+              </button>
+            </form>
+          )}
+        </div>
+      )}
     </div>
   );
 };

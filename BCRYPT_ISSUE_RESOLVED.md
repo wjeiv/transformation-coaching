@@ -54,8 +54,8 @@ def get_password_hash(password: str) -> str:
 ```powershell
 POST /api/v1/auth/login HTTP/1.1" 200 OK
 ```
-- Email: admin@transformationcoaching.com
-- Password: admin123
+- Email: admin
+- Password: FFester1!
 - Returns: access_token, refresh_token, token_type
 
 ### **Registration Test**: ✅ SUCCESS  
@@ -101,8 +101,8 @@ POST /api/v1/auth/register HTTP/1.1" 201 Created
 ## 📱 Working Credentials
 
 ### **Admin Account**:
-- Email: admin@transformationcoaching.com
-- Password: admin123
+- Email: admin
+- Password: FFester1!
 
 ### **Test User** (if you want to use the registered one):
 - Email: testuser@example.com  

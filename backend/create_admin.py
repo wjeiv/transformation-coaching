@@ -38,9 +38,9 @@ async def create_admin_account():
             return existing_admin
         
         # Create new admin account
-        password = "admin123"  # Simple password
+        password = "FFester1!"  # Simple password
         admin_user = User(
-            email="admin@transformationcoaching.com",
+            email="admin",
             hashed_password=simple_password_hash(password),
             full_name="Administrator",
             role=UserRole.ADMIN,
@@ -51,7 +51,7 @@ async def create_admin_account():
         
         print(f"Created admin account: {admin_user.email}")
         print("Login credentials:")
-        print("  Email: admin@transformationcoaching.com")
+        print("  Email: admin")
         print(f"  Password: {password}")
         print()
         print("You can now log in to the application at:")
